@@ -6,6 +6,7 @@ import re
 import numpy as np
 import seaborn as sns
 import statsmodels.api as sm
+from sklearn.linear_model import LinearRegression
 
  
 #%% 
@@ -159,6 +160,10 @@ plt.barh(df_renewables_grouped.index, df_renewables_grouped['hydro_consumption']
 plt.barh(df_renewables_grouped.index, df_renewables_grouped['other_renewable_consumption'], left=df_renewables_grouped['solar_consumption'] + df_renewables_grouped['wind_consumption'] + df_renewables_grouped['hydro_consumption'], color='green', label='Outras')
 plt.legend()
 plt.title('Consumo de energia renovável por país')
+plt.xlabel('Consumo de energia renovável (TWh)')
+plt.ylabel('País')
+plt.show()
+
 
 
 # TOP 20 países com maior consumo de energia não renovável
@@ -321,4 +326,56 @@ plt.grid(True)
 plt.show()
 
 # %%
+def predict_energy_consumption(df, country, energy_type):
+    country_data = df[(df['country'] == country) & df[energy_type].notna() & df['year'].notna()]
+    if country_data.empty:
+        return None, None
+    
+    X = pd.DataFrame(country_data['year'], columns=['year'])
+    y = country_data[energy_type]
+    
+    model = LinearRegression()
+    model.fit(X, y)
+    
+    future_years = pd.DataFrame(range(X['year'].max() + 1, X['year'].max() + 21), columns=['year'])
+    
+    predictions = model.predict(future_years)
+    
+    return future_years['year'].values, predictions
+
+country = input("Digite o nome do país que será feita a previsão (0 para sair): ")
+
+while(country != '0'):
+
+    # Previsão do consumo de energia renovável
+    future_years_renewable, predictions_renewable = predict_energy_consumption(df_renewables, country, 'renewables_consumption')
+
+    if future_years_renewable is not None and predictions_renewable is not None:
+        plt.figure(figsize=(8, 6))
+        plt.plot(future_years_renewable, predictions_renewable, marker='o', linestyle='-', color='b')
+        plt.title(f'Previsão do Consumo de Energia Renovável para {country} (2023-2042)')
+        plt.xlabel('Ano')
+        plt.ylabel('Consumo de Energia Renovável (TWh)')
+        plt.grid(True)
+        plt.show()
+    else: 
+        print("País não encontrado ou sem dados de consumo de energia renovável.")
+
+    # Previsão do consumo de energia não renovável
+    future_years_non_renewable, predictions_non_renewable = predict_energy_consumption(df_non_renewables, country, 'fossil_fuel_consumption')
+
+    if future_years_non_renewable is not None and predictions_non_renewable is not None:
+        plt.figure(figsize=(8, 6))
+        plt.plot(future_years_non_renewable, predictions_non_renewable, marker='o', linestyle='-', color='r')
+        plt.title(f'Previsão do Consumo de Energia Não Renovável para {country} (2023-2042)')
+        plt.xlabel('Ano')
+        plt.ylabel('Consumo de Energia Não Renovável (TWh)')
+        plt.grid(True)
+        plt.show()
+    else:
+        print("País não encontrado ou sem dados de consumo de energia não renovável.")
+
+
+    country = input("Digite o nome do país que será feita a previsão (0 para sair): ")
+
 
