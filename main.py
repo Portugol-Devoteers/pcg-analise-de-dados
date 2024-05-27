@@ -337,7 +337,7 @@ def predict_energy_consumption(df, country, energy_type):
     model = LinearRegression()
     model.fit(X, y)
     
-    future_years = pd.DataFrame(range(X['year'].max() + 1, X['year'].max() + 21), columns=['year'])
+    future_years = pd.DataFrame(range(X['year'].max() + 1, X['year'].max() + 51), columns=['year'])
     
     predictions = model.predict(future_years)
     
@@ -351,9 +351,9 @@ while(country != '0'):
     future_years_renewable, predictions_renewable = predict_energy_consumption(df_renewables, country, 'renewables_consumption')
 
     if future_years_renewable is not None and predictions_renewable is not None:
-        plt.figure(figsize=(8, 6))
+        plt.figure(figsize=(12, 6))
         plt.plot(future_years_renewable, predictions_renewable, marker='o', linestyle='-', color='b')
-        plt.title(f'Previsão do Consumo de Energia Renovável para {country} (2023-2042)')
+        plt.title(f'Previsão do Consumo de Energia Renovável para {country} (2023-2073)')
         plt.xlabel('Ano')
         plt.ylabel('Consumo de Energia Renovável (TWh)')
         plt.grid(True)
@@ -365,9 +365,9 @@ while(country != '0'):
     future_years_non_renewable, predictions_non_renewable = predict_energy_consumption(df_non_renewables, country, 'fossil_fuel_consumption')
 
     if future_years_non_renewable is not None and predictions_non_renewable is not None:
-        plt.figure(figsize=(8, 6))
+        plt.figure(figsize=(12, 6))
         plt.plot(future_years_non_renewable, predictions_non_renewable, marker='o', linestyle='-', color='r')
-        plt.title(f'Previsão do Consumo de Energia Não Renovável para {country} (2023-2042)')
+        plt.title(f'Previsão do Consumo de Energia Não Renovável para {country} (2023-2073)')
         plt.xlabel('Ano')
         plt.ylabel('Consumo de Energia Não Renovável (TWh)')
         plt.grid(True)
@@ -379,3 +379,5 @@ while(country != '0'):
     country = input("Digite o nome do país que será feita a previsão (0 para sair): ")
 
 
+
+# %%
